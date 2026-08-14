@@ -1,0 +1,104 @@
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum Priority {
+  NO_PRIORITY
+  URGENT
+  HIGH
+  MEDIUM
+  LOW
+}
+
+enum TaskStatus {
+  TODO
+  DOING
+  COMPLETED
+  ON_HOLD
+}
+
+enum Theme {
+  LIGHT
+  DARK
+}
+
+model User {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  email       String   @unique
+  fullName    String?  @default("Dexter")
+  title       String?  @default("Designer")
+  username    String?  @default("Dexuser")
+  avatarUrl   String?
+  theme       Theme    @default(LIGHT)
+  colorMode   String   @default("blue")
+  isGuest     Boolean  @default(false)
+  taskIds     String[] @db.ObjectId
+  tasks       Task[]   @relation(fields: [taskIds], references: [id])
+  comments    Comment[]
+  createdAt   DateTime @default(now())
+}
+
+model Project {
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  title     String
+  priority  Priority  @default(MEDIUM)
+  leadName  String?   @default("Dexter")
+  dueDate   DateTime?
+  tasks     Task[]
+  createdAt DateTime  @default(now())
+}
+
+model Task {
+  id          String      @id @default(auto()) @map("_id") @db.ObjectId
+  title       String
+  description String?
+  status      TaskStatus  @default(TODO)
+  priority    Priority    @default(MEDIUM)
+  dueDate     DateTime?
+  labels      String[]
+  role        String?     @default("Admin")
+  projectId   String?     @db.ObjectId
+  project     Project?    @relation(fields: [projectId], references: [id])
+  userIds     String[]    @db.ObjectId
+  assignees   User[]      @relation(fields: [userIds], references: [id])
+  subtasks    Subtask[]
+  comments    Comment[]
+  updates     TaskUpdate[]
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+}
+
+model Subtask {
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  title     String
+  priority  Priority  @default(MEDIUM)
+  dueDate   DateTime?
+  completed Boolean   @default(false)
+  taskId    String    @db.ObjectId
+  task      Task      @relation(fields: [taskId], references: [id], onDelete: Cascade)
+}
+
+model Comment {
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  content   String
+  author    String    @default("Dexter")
+  taskId    String    @db.ObjectId
+  task      Task      @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  userId    String?   @db.ObjectId
+  user      User?     @relation(fields: [userId], references: [id])
+  createdAt DateTime  @default(now())
+}
+
+model TaskUpdate {
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  action    String
+  author    String    @default("You")
+  taskId    String    @db.ObjectId
+  task      Task      @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  createdAt DateTime  @default(now())
+}
