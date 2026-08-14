@@ -1,0 +1,33 @@
+# Dependencies
+node_modules/
+*/node_modules/
+
+# Next.js build output
+.next/
+client/.next/
+out/
+client/out/
+
+# NestJS build output
+dist/
+server/dist/
+
+# IDE, Agent & Editor files
+.vscode/
+.idea/
+.agents/
+.claude/
+.windsurf/
+server/.windsurf/
+*.log
+
+# Environment variables (Never commit secrets!)
+.env
+.env.local
+.env.*.local
+server/.env
+client/.env.local
+
+# OS files
+.DS_Store
+Thumbs.db
