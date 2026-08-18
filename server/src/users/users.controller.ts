@@ -1,20 +1,26 @@
-import { Controller, Get, Patch, Body } from '@nestjs/common';
+import { Controller, Get, Patch, Body, Request } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { Theme } from '@prisma/client';
 
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @Get('me')
-  getProfile() {
-    return this.usersService.getProfile();
+  @Get()
+  async getAllUsers() {
+    return this.usersService.getAllUsers();
   }
 
-  @Patch('preferences')
-  updatePreferences(
-    @Body() body: { email: string; theme?: Theme; colorMode?: string; fullName?: string; title?: string; username?: string },
-  ) {
-    return this.usersService.updatePreferences(body.email || 'Dexter@gmail.com', body);
+  @Get('me')
+  async getProfile(@Request() req: any) {
+    const userId = req.user?.id || req.headers['x-user-id'];
+    const email = req.user?.email || req.headers['x-user-email'];
+    return this.usersService.getProfile(userId, email);
+  }
+
+  @Patch('me')
+  async updateProfile(@Request() req: any, @Body() body: any) {
+    const userId = req.user?.id || req.headers['x-user-id'];
+    const email = req.user?.email || req.headers['x-user-email'];
+    return this.usersService.updateProfile(userId, email, body);
   }
 }

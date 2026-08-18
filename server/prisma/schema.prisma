@@ -28,19 +28,23 @@ enum Theme {
 }
 
 model User {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  email       String   @unique
-  fullName    String?  @default("Dexter")
-  title       String?  @default("Designer")
-  username    String?  @default("Dexuser")
-  avatarUrl   String?
-  theme       Theme    @default(LIGHT)
-  colorMode   String   @default("blue")
-  isGuest     Boolean  @default(false)
-  taskIds     String[] @db.ObjectId
-  tasks       Task[]   @relation(fields: [taskIds], references: [id])
-  comments    Comment[]
-  createdAt   DateTime @default(now())
+  id           String    @id @default(auto()) @map("_id") @db.ObjectId
+  email        String    @unique
+  password     String?
+  fullName     String?   @default("Dexter")
+  title        String?   @default("Designer")
+  username     String?   @default("Dexuser")
+  avatarUrl    String?
+  googleId     String?
+  mfaSecret    String?
+  isMfaEnabled Boolean   @default(false)
+  theme        Theme     @default(LIGHT)
+  colorMode    String    @default("blue")
+  isGuest      Boolean   @default(false)
+  taskIds      String[]  @db.ObjectId
+  tasks        Task[]    @relation(fields: [taskIds], references: [id])
+  comments     Comment[]
+  createdAt    DateTime  @default(now())
 }
 
 model Project {
@@ -54,23 +58,26 @@ model Project {
 }
 
 model Task {
-  id          String      @id @default(auto()) @map("_id") @db.ObjectId
+  id          String       @id @default(auto()) @map("_id") @db.ObjectId
   title       String
   description String?
-  status      TaskStatus  @default(TODO)
-  priority    Priority    @default(MEDIUM)
+  status      TaskStatus   @default(TODO)
+  priority    Priority     @default(MEDIUM)
   dueDate     DateTime?
   labels      String[]
-  role        String?     @default("Admin")
-  projectId   String?     @db.ObjectId
-  project     Project?    @relation(fields: [projectId], references: [id])
-  userIds     String[]    @db.ObjectId
-  assignees   User[]      @relation(fields: [userIds], references: [id])
+  role        String?      @default("Admin")
+  reporter    String?      @default("Dexter")
+  isLocked    Boolean      @default(false)
+  isPublic    Boolean      @default(false)
+  projectId   String?      @db.ObjectId
+  project     Project?     @relation(fields: [projectId], references: [id])
+  userIds     String[]     @db.ObjectId
+  assignees   User[]       @relation(fields: [userIds], references: [id])
   subtasks    Subtask[]
   comments    Comment[]
   updates     TaskUpdate[]
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
 }
 
 model Subtask {
@@ -84,21 +91,33 @@ model Subtask {
 }
 
 model Comment {
-  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
   content   String
-  author    String    @default("Dexter")
-  taskId    String    @db.ObjectId
-  task      Task      @relation(fields: [taskId], references: [id], onDelete: Cascade)
-  userId    String?   @db.ObjectId
-  user      User?     @relation(fields: [userId], references: [id])
-  createdAt DateTime  @default(now())
+  author    String   @default("Dexter")
+  type      String   @default("COMMENT")
+  taskId    String   @db.ObjectId
+  task      Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  userId    String?  @db.ObjectId
+  user      User?    @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
 }
 
 model TaskUpdate {
-  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
   action    String
-  author    String    @default("You")
-  taskId    String    @db.ObjectId
-  task      Task      @relation(fields: [taskId], references: [id], onDelete: Cascade)
-  createdAt DateTime  @default(now())
+  author    String   @default("You")
+  taskId    String   @db.ObjectId
+  task      Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+}
+
+model Notification {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  recipient String
+  author    String
+  title     String
+  message   String
+  taskId    String?  @db.ObjectId
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
 }
