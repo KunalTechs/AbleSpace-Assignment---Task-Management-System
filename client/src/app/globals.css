@@ -1,0 +1,26 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 240 10% 3.9%;
+    --primary: 238.7 83.5% 66.7%;
+    --primary-foreground: 0 0% 98%;
+    --border: 240 5.9% 90%;
+  }
+
+  .dark {
+    --background: 240 10% 3.9%;
+    --foreground: 0 0% 98%;
+    --border: 240 3.7% 15.9%;
+  }
+
+  [data-color="amber"] { --primary: 38 92% 50%; }
+  [data-color="blue"] { --primary: 238.7 83.5% 66.7%; }
+  [data-color="pink"] { --primary: 330 81% 60%; }
+  [data-color="rose"] { --primary: 346.8 77.2% 49.8%; }
+  [data-color="emerald"] { --primary: 158 64% 45%; }
+  [data-color="black"] { --primary: 240 5.9% 10%; }
+}
