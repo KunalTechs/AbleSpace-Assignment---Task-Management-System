@@ -1,18 +1,32 @@
-import { Controller, Get, Post, Body } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Delete, Body, Param } from '@nestjs/common';
 import { ProjectsService } from './projects.service';
-import { Priority } from '@prisma/client';
 
 @Controller('projects')
 export class ProjectsController {
   constructor(private readonly projectsService: ProjectsService) {}
 
   @Get()
-  findAll() {
+  async findAll() {
     return this.projectsService.findAll();
   }
 
+  @Get(':id')
+  async findOne(@Param('id') id: string) {
+    return this.projectsService.findOne(id);
+  }
+
   @Post()
-  create(@Body() body: { title: string; priority?: Priority; leadName?: string; dueDate?: string }) {
-    return this.projectsService.create(body);
+  async create(@Body() createProjectDto: any) {
+    return this.projectsService.create(createProjectDto);
+  }
+
+  @Patch(':id')
+  async update(@Param('id') id: string, @Body() updateProjectDto: any) {
+    return this.projectsService.update(id, updateProjectDto);
+  }
+
+  @Delete(':id')
+  async delete(@Param('id') id: string) {
+    return this.projectsService.delete(id);
   }
 }

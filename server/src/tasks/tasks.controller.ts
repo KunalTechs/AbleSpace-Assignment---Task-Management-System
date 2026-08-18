@@ -1,51 +1,80 @@
-import { Controller, Get, Post, Patch, Delete, Body, Param, Query } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Patch,
+  Delete,
+  Body,
+  Param,
+  Query,
+  Request,
+} from '@nestjs/common';
 import { TasksService } from './tasks.service';
-import { CreateTaskDto, UpdateTaskDto, CreateSubtaskDto, UpdateSubtaskDto, CreateCommentDto } from './dto/task.dto';
-import { TaskStatus } from '@prisma/client';
 
 @Controller('tasks')
 export class TasksController {
   constructor(private readonly tasksService: TasksService) {}
 
   @Get()
-  findAll(@Query('search') search?: string, @Query('status') status?: TaskStatus) {
-    return this.tasksService.findAll(search, status);
+  async findAll(
+    @Query('search') search?: string,
+    @Query('projectId') projectId?: string,
+  ) {
+    return this.tasksService.findAll({ search, projectId });
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  async findOne(@Param('id') id: string) {
     return this.tasksService.findOne(id);
   }
 
   @Post()
-  create(@Body() dto: CreateTaskDto) {
-    return this.tasksService.create(dto);
+  async create(@Body() data: any, @Request() req: any) {
+    const user = req.headers['x-user-email'] || req.headers['x-user-id'];
+    return this.tasksService.create(data, user);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() dto: UpdateTaskDto) {
-    return this.tasksService.update(id, dto);
+  async update(@Param('id') id: string, @Body() data: any, @Request() req: any) {
+    const user = req.headers['x-user-email'] || req.headers['x-user-id'];
+    return this.tasksService.update(id, data, user);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.tasksService.remove(id);
+  async remove(@Param('id') id: string, @Request() req: any) {
+    const user = req.headers['x-user-email'] || req.headers['x-user-id'];
+    return this.tasksService.remove(id, user);
   }
 
-  // Subtask routes
   @Post(':id/subtasks')
-  addSubtask(@Param('id') id: string, @Body() dto: CreateSubtaskDto) {
-    return this.tasksService.addSubtask(id, dto);
+  async addSubtask(@Param('id') taskId: string, @Body() data: any) {
+    return this.tasksService.addSubtask(taskId, data);
   }
 
-  @Patch('subtasks/:subtaskId')
-  updateSubtask(@Param('subtaskId') subtaskId: string, @Body() dto: UpdateSubtaskDto) {
-    return this.tasksService.updateSubtask(subtaskId, dto);
+  @Delete(':id/subtasks/:subtaskId')
+  async deleteSubtask(
+    @Param('id') taskId: string,
+    @Param('subtaskId') subtaskId: string,
+  ) {
+    return this.tasksService.deleteSubtask(subtaskId);
   }
 
-  // Comment route
   @Post(':id/comments')
-  addComment(@Param('id') id: string, @Body() dto: CreateCommentDto) {
-    return this.tasksService.addComment(id, dto);
+  async addComment(@Param('id') taskId: string, @Body() data: any) {
+    return this.tasksService.addComment(taskId, data);
+  }
+
+  @Delete(':id/comments/:commentId')
+  async deleteComment(
+    @Param('id') taskId: string,
+    @Param('commentId') commentId: string,
+  ) {
+    return this.tasksService.deleteComment(commentId);
+  }
+
+  @Post(':id/duplicate')
+  async duplicateTask(@Param('id') id: string, @Request() req: any) {
+    const user = req.headers['x-user-email'] || req.headers['x-user-id'];
+    return this.tasksService.duplicate(id, user);
   }
 }
