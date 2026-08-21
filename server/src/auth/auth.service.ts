@@ -21,11 +21,19 @@ export class AuthService {
       user = await this.prisma.user.create({
         data: {
           email: 'Dexter@gmail.com',
-          fullName: 'Dexter',
-          title: 'Designer',
+          fullName: 'Dexter (Superuser)',
+          title: 'Superuser / Admin',
           username: 'Dexuser',
           isGuest: true,
           colorMode: 'blue',
+        },
+      });
+    } else {
+      user = await this.prisma.user.update({
+        where: { id: user.id },
+        data: {
+          fullName: 'Dexter (Superuser)',
+          title: 'Superuser / Admin',
         },
       });
     }

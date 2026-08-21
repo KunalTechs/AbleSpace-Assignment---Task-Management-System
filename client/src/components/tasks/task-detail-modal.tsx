@@ -117,12 +117,12 @@ export function TaskDetailModal({ task, isOpen, onClose, onTaskUpdated }: TaskDe
 
   const handleAddComment = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newComment.trim() || currentTask.isLocked) return;
+    if (!newComment.trim()) return;
 
     try {
       const res = await api.post(`/tasks/${currentTask.id}/comments`, {
         content: newComment,
-        author: 'Dexter',
+        author: 'Dexter (Superuser)',
       });
       const updated = {
         ...currentTask,
@@ -139,7 +139,7 @@ export function TaskDetailModal({ task, isOpen, onClose, onTaskUpdated }: TaskDe
 
   const handleAddSubtask = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newSubtaskTitle.trim() || currentTask.isLocked) return;
+    if (!newSubtaskTitle.trim()) return;
 
     try {
       const res = await api.post(`/tasks/${currentTask.id}/subtasks`, {
